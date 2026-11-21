@@ -327,10 +327,24 @@ Typing state is transient and never enters durable replay.
 Accounts inactive for 90 days are removed with their credentials, history, settings, and IRCord-hosted files.
 Authenticated HTTP requests and socket heartbeats count as account activity; incoming IRC traffic does not.
 
+### Account settings and picker API
+
+Go serves appearance, client preferences, saved GIFs, emoji usage, and saved themes under
+`/api/v1/app/`. These operations require a session and use the authenticated account's existing
+documents. Clients receive the same private revision events after a successful write.
+Concurrent theme edits return HTTP 412 with the saved theme so the editor can resolve the conflict.
+
+The emoji catalog and read-aloud model shard redirects are public. The model redirects only accept
+shards from the shipped manifest and point to a pinned model revision.
+
+The live web client uses the typed Go API and can fall back to the previous routes during a mixed-version
+rollout. Demo mode serves its own fixtures. Frontend release notes ship as a static build asset at
+`/build-info/changelog.json`.
+
 ### Generated API
 
 The API defaults to `http://127.0.0.1:8080`.
-Scalar documentation is available at `/docs`; OpenAPI is available at `/openapi.json`.
+Scalar documentation is available at `/docs`. OpenAPI is available at `/openapi.json`.
 
 After changing Go request types, response types, or routes, run `make api-generate`.
 This command updates the OpenAPI artifact, frontend types, browser WebSocket validator, and standalone operator client.
