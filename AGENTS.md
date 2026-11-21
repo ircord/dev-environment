@@ -3,6 +3,10 @@
 This file defines how contributors plan, implement, verify, and release changes
 to IRCord.
 
+This development workspace pins the backend, frontend, CLI, and website as Git
+submodules. Commit and push component changes in their own repositories. Update
+the matching submodule pins here and verify changes that span components.
+
 ## Contract
 
 ### Choose issue tracking
@@ -75,8 +79,8 @@ Use private WebSockets for live updates. Preserve account isolation, bounded
 queues, durable replay, and credential redaction.
 
 After changing application programming interface (API) contracts, run
-`make api-generate`. Keep OpenAPI, the typed frontend client, and WebSocket
-validation aligned with Go contracts.
+`make api-generate` from the workspace root. Keep OpenAPI, the typed frontend
+client, and WebSocket validation aligned with Go contracts.
 
 Run the relevant local checks from [README.md](README.md). Add meaningful
 regression tests for behavior changes. After UI changes, verify behavior in a
@@ -111,9 +115,9 @@ deployed behavior.
 
 ### Release changes
 
-Backend, frontend, and website builds and publication run only for pushed version tags,
-such as `v0.1.0`. Flux follows stable `vX.Y.Z` images. Branch pushes and pull
-requests do not build or deploy these images.
+The workspace publishes backend, frontend, and website images for pushed
+version tags such as `v0.7.3`. Publish CLI binaries from the matching tag in the
+CLI repository. Flux follows stable `vX.Y.Z` images.
 
 The active embedding pipeline uses direct files, the configured Reddit API handler,
 anonymous Instagram and TikTok extraction, reviewed provider handlers, and generic oEmbed.

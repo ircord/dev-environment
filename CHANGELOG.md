@@ -5,6 +5,10 @@ What changed for people using IRCord, newest release first. Each release lists w
 
 ## Unreleased
 
+## v0.7.3 — 2026-11-21
+
+- Behind-the-scenes improvements.
+
 ## v0.7.2 — 2026-11-21
 
 ### Improved
