@@ -1,8 +1,6 @@
 name: Check
-# Runs the local checks from the README before anything is published. The tag
-# release workflows call this workflow and wait for it to pass.
+# Checks the component revisions pinned for development.
 on:
-  workflow_call:
   push:
     branches: [main]
   pull_request:
@@ -47,8 +45,6 @@ jobs:
           bun run build
       - name: Website lint, types, unit tests and build
         working-directory: website
-        env:
-          IRCORD_RELEASE_DIR: ${{ github.workspace }}
         run: |
           bun run lint
           bun run typecheck

@@ -854,7 +854,7 @@ bun run generate   # writes the static site to .output/public
 
 To serve the generated site as in production, build and run the image ([Website image](#website-image)).
 
-Run `make website` from the workspace root to preview the shared changelog.
+Run `make website` from the workspace root to preview the site.
 Run `make website-check` for lint, types, unit tests, and the static build.
 
 ### Website screenshots
@@ -884,17 +884,13 @@ Build it from the repository root:
 docker build -t ircord-website website
 ```
 
-Release tags publish the image as `ghcr.io/ircord/ircord-website`.
 Serve the website at `ircord.com` and the app at `chat.ircord.com`.
 
 ## Releases
 
-GitHub Actions checks branch changes and publishes on version tags such as `v0.7.3`.
-
-- The workspace tag pins the components. Its workflow checks the full workspace
-  and builds the backend, frontend, and website images for Linux amd64 and arm64.
-- The matching CLI tag must point to the CLI commit pinned by the workspace tag.
-  Its workflow checks the client and publishes all six platform builds together.
+The workspace runs integration checks against its pinned components. Each
+component repository manages its own changelog, tags, and release pipeline.
+Frontend, backend, and CLI versions can advance independently.
 
 ### Standalone CLI downloads
 
@@ -915,42 +911,22 @@ The release also includes `ircordctl_v0.1.0_checksums.txt`. Verify a downloaded 
 shasum -a 256 --ignore-missing -c ircordctl_v0.1.0_checksums.txt
 ```
 
-On Linux use `sha256sum --ignore-missing -c` instead. A new release gets the tag's section of `CHANGELOG.md` as its notes, followed by GitHub's compare link; a tag without a section gets generated notes. Tags with a prerelease suffix are marked as prereleases. If the release already exists, the workflow uploads/replaces only its CLI assets and preserves its notes, draft state, and prerelease state.
+On Linux use `sha256sum --ignore-missing -c` instead. A new release uses the
+version's notes from the CLI changelog. Tags with a prerelease suffix create
+prereleases. Reruns replace named CLI assets and preserve the release details.
 
 ### Container images
 
-The container workflow publishes:
+The backend and frontend repositories publish their own multi-platform images:
 
 - `ghcr.io/ircord/ircord-backend:v0.7.3`
 - `ghcr.io/ircord/ircord-frontend:v0.7.3`
-- `ghcr.io/ircord/ircord-website:v0.7.3`
 
-Each image also has a tag for the workspace commit. Flux follows stable `vX.Y.Z` releases.
-
-### Cutting a release
-
-`CHANGELOG.md` is the user-facing changelog. Every pull request with a user-visible change adds one plain-language line under `## Unreleased`, grouped as **New**, **Improved** or **Fixed**; refactors, tests, CI, tooling and docs add nothing.
-
-1. In the release commit, rename `## Unreleased` to `## v0.1.0 — YYYY-MM-DD` (today's date) and add a fresh, empty `## Unreleased` above it. A release with nothing user-facing gets the single line "Behind-the-scenes improvements."
-2. Run `make test check frontend-check website-check`.
-3. Push the release commit to workspace `main`.
-4. Tag and push the release commit in the workspace repository.
-5. Tag and push the pinned CLI commit in the CLI repository with the same version.
-6. Check all three images and the CLI assets.
-
-If a tag fails because of source changes, fix the source and release the next patch version.
-
-That section becomes the GitHub Release notes and the in-client notes.
+Each image also has a tag for its source commit. Flux follows stable
+`vX.Y.Z` releases independently for each image.
 
 ### In-client release notes
 
-The frontend image carries release notes through its own version. The app shows
-them in **What’s new** and under Settings → About. The workspace release uses
-`CHANGELOG.md` at the tagged commit and reads older notes from the original
-repository's GitHub releases. Local and development builds show no release notes.
-
-### Collaborators
-
-`COLLABORATORS.md` at the workspace root lists the people who build IRCord.
-Add one `- Name` line per person. The next release uses the updated names in
-Settings → About and on the public site.
+Settings → About shows the frontend and backend versions side by side. Switch
+tabs to read their release notes. The frontend bundles its own notes. The
+signed-in client reads the backend's notes from `GET /api/v1/changelog`.

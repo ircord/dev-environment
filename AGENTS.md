@@ -94,9 +94,9 @@ When the user requests local servers, keep the frontend and backend available.
 
 ### Update the changelog
 
-For user-visible changes, add one plain-language line under `## Unreleased` in
-`CHANGELOG.md`. Use the **New**, **Improved**, or **Fixed** group. If the required
-group is missing, create it.
+For user-visible changes, add one plain-language line under `## Unreleased`
+in the affected component's `CHANGELOG.md`. Use **New**, **Improved**, or
+**Fixed**. Add the group if it is missing.
 
 Describe what users can now do or what behaves differently. Omit issue numbers,
 file names, and internal terms.
@@ -115,9 +115,9 @@ deployed behavior.
 
 ### Release changes
 
-The workspace publishes backend, frontend, and website images for pushed
-version tags such as `v0.7.3`. Publish CLI binaries from the matching tag in the
-CLI repository. Flux follows stable `vX.Y.Z` images.
+The backend and frontend publish images from their own version tags. The CLI
+publishes archives from its own version tags. Components can advance
+independently. Flux follows stable `vX.Y.Z` images.
 
 The active embedding pipeline uses direct files, the configured Reddit API handler,
 anonymous Instagram and TikTok extraction, reviewed provider handlers, and generic oEmbed.
@@ -134,8 +134,8 @@ optional when generic oEmbed already supplies the required data.
 Create a release tag only when the user has authorized release or deployment.
 Use the latest stable Go version in builds.
 
-Follow [Cutting a release](README.md#cutting-a-release). In the release commit,
-move the `## Unreleased` changes in `CHANGELOG.md` into the version's section.
+In a component's release commit, move its `## Unreleased` changes into the
+version's section and add a new `## Unreleased` heading.
 
 ### Protect private material
 

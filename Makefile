@@ -18,7 +18,7 @@ build:
 frontend-check:
 	cd frontend && bun run api:check && bun run lint && bun run typecheck && bun run test:unit && bun run build
 website-check:
-	cd website && export IRCORD_RELEASE_DIR="$(CURDIR)" && bun run lint && bun run typecheck && bun run test && bun run generate
+	cd website && bun run lint && bun run typecheck && bun run test && bun run generate
 
 .PHONY: backend frontend website dev-backend
 AIR ?= air
@@ -43,7 +43,7 @@ backend:
 frontend:
 	cd frontend && bun run dev
 website:
-	cd website && IRCORD_RELEASE_DIR="$(CURDIR)" bun run dev
+	cd website && bun run dev
 dev-backend: backend
 ergo-up:
 	sh infra/ergo/setup.sh
