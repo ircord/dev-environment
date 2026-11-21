@@ -158,8 +158,8 @@ deployed behavior.
 
 ### Release changes
 
-The backend and frontend publish images from their own version tags. The CLI
-publishes archives from its own version tags. Components can advance
+The backend, frontend, and website publish images from their own version tags.
+The CLI publishes archives from its own version tags. Components can advance
 independently. Check the component's publish workflow before tagging. Flux
 follows the stable `vX.Y.Z` images configured in the homelab GitOps repository.
 
