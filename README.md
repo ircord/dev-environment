@@ -919,7 +919,7 @@ prereleases. Reruns replace named CLI assets and preserve the release details.
 
 The backend and frontend repositories publish their own multi-platform images:
 
-- `ghcr.io/ircord/ircord-backend:v0.7.3`
+- `ghcr.io/ircord/ircord-backend:v0.7.4`
 - `ghcr.io/ircord/ircord-frontend:v0.7.3`
 
 Each image also has a tag for its source commit. Flux follows stable
