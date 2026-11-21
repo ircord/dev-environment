@@ -337,9 +337,9 @@ Concurrent theme edits return HTTP 412 with the saved theme so the editor can re
 The emoji catalog and read-aloud model shard redirects are public. The model redirects only accept
 shards from the shipped manifest and point to a pinned model revision.
 
-The live web client uses the typed Go API and can fall back to the previous routes during a mixed-version
-rollout. Demo mode serves its own fixtures. Frontend release notes ship as a static build asset at
-`/build-info/changelog.json`.
+Deploy the Go app API before deploying the frontend that uses it. Both releases use the same
+account documents, so saved settings carry over. Demo mode serves its own fixtures at `/api/app/`.
+Frontend release notes ship as a static build asset at `/build-info/changelog.json`.
 
 ### Generated API
 
