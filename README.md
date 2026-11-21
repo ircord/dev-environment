@@ -847,7 +847,7 @@ curl -X PUT -H "Authorization: Bearer $IRCORD_ADMIN_TOKEN" https://chat.example.
 
 The [public website](https://ircord.com) is checked out at `website/`.
 It is a static Nuxt site with a home page and release notes for the frontend, backend, and desktop app.
-The build reads each component's `CHANGELOG.md` from GitHub. The site sends no scripts.
+The changelog pages read each component's `CHANGELOG.md` from GitHub when opened.
 Its colors follow the app's Hibiki scheme.
 
 From `website/`, with Bun 1.4.4:
