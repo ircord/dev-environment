@@ -3,9 +3,51 @@
 This file defines how contributors plan, implement, verify, and release changes
 to IRCord.
 
-This development workspace pins the backend, frontend, CLI, and website as Git
-submodules. Commit and push component changes in their own repositories. Update
-the matching submodule pins here and verify changes that span components.
+## Repositories
+
+[ircord/dev-environment](https://github.com/ircord/dev-environment) owns the
+development commands, integration checks, and submodule pins.
+
+| Workspace path | Repository | Scope |
+| --- | --- | --- |
+| `backend/` | [ircord/backend](https://github.com/ircord/backend) | Go backend, IRC connections, and API contracts |
+| `frontend/` | [ircord/frontend](https://github.com/ircord/frontend) | Nuxt chat client and proxy |
+| `cli/` | [ircord/cli](https://github.com/ircord/cli) | `ircordctl` administration client |
+| `website/` | [ircord/ircord.com](https://github.com/ircord/ircord.com) | Public website and component release notes |
+| `desktop/` | [ircord/desktop](https://github.com/ircord/desktop) | Desktop client |
+| `mobile/` | [ircord/mobile](https://github.com/ircord/mobile) | Mobile client |
+| `hosting/` | [ircord/hosting](https://github.com/ircord/hosting) | Production Docker Compose and Helm chart |
+
+Use [ircord/issues](https://github.com/ircord/issues/issues) to track work for any
+component.
+
+## Git submodules
+
+The workspace stores each component's repository URL in [`.gitmodules`](.gitmodules)
+and records its exact commit as a submodule pin.
+
+Clone the workspace with its pinned component commits.
+
+```sh
+git clone --recurse-submodules https://github.com/ircord/dev-environment.git IRCord
+```
+
+After pulling or switching the workspace branch, check `git submodule status`
+and inspect local work in the affected components. Run
+`git submodule update --init --recursive` to check out the recorded commits.
+If `.gitmodules` changed, run `git submodule sync --recursive` first.
+A leading `+` in `git submodule status` means the checkout differs from its pin.
+
+A submodule usually starts on a detached `HEAD`. Create or switch to a branch
+inside the component before editing. For example, run
+`git -C backend switch -c fix/backend-startup` from the workspace root.
+Make and push component commits in their own repositories. Each pin must refer
+to a commit available from its GitHub remote.
+
+From the workspace root, stage the component directory to record its new pin.
+For example, `git add backend` stages the backend commit reference. Review the
+staged pins with `git diff --cached --submodule=log`. For cross-component work,
+test the components together and commit their pins together.
 
 ## Contract
 
@@ -29,9 +71,9 @@ Report the result, validation, and unfinished work to the user.
 
 ### Work with an issue
 
-If an issue exists, read it before implementation. Review its dependencies,
-assignees, comments, and related pull requests. If no issue exists, create one
-for the agreed scope.
+Read the issue in [ircord/issues](https://github.com/ircord/issues/issues) before
+implementation. Review its dependencies, assignees, comments, and related pull
+requests. If an issue is needed, create it there for the agreed scope.
 
 Write issue descriptions that contributors can understand without local planning
 files. Use local planning files as reference material.
@@ -106,8 +148,9 @@ skip the changelog entry.
 
 ### Complete work
 
-For work with an issue, reference it in the commit or pull request. Before
-closing the issue, record the changes and actual validation results.
+For work with an issue, use the full reference in the commit or pull request,
+such as `ircord/issues#123`. Before closing the issue, record the changes and
+actual validation results.
 
 Mark work complete only after you satisfy the agreed requirements and any issue
 acceptance criteria. Distinguish source changes, local verification, and
@@ -117,7 +160,16 @@ deployed behavior.
 
 The backend and frontend publish images from their own version tags. The CLI
 publishes archives from its own version tags. Components can advance
-independently. Flux follows stable `vX.Y.Z` images.
+independently. Check the component's publish workflow before tagging. Flux
+follows the stable `vX.Y.Z` images configured in the homelab GitOps repository.
+
+Create a release tag only when the user has authorized release or deployment.
+Use the latest stable Go version in builds.
+
+In a component's release commit, move its `## Unreleased` changes into the
+version's section and add a new `## Unreleased` heading.
+
+### Link previews
 
 The active embedding pipeline uses direct files, the configured Reddit API handler,
 anonymous Instagram and TikTok extraction, reviewed provider handlers, and generic oEmbed.
@@ -130,12 +182,6 @@ selection, caching and expiry in `useEmbed`. Reserve geometry before fetching;
 loading, error and player states must not resize it. Unknown sites use a fixed
 metadata card until they have a controlled adapter. A separate Go extractor is
 optional when generic oEmbed already supplies the required data.
-
-Create a release tag only when the user has authorized release or deployment.
-Use the latest stable Go version in builds.
-
-In a component's release commit, move its `## Unreleased` changes into the
-version's section and add a new `## Unreleased` heading.
 
 ### Protect private material
 
@@ -170,10 +216,6 @@ and code generators.
 GitHub issues are preferred, but optional. Direct user instructions override
 these workflow defaults.
 
-Nuxt and Vue code lives in `frontend/`. Go, Huma, and upstream Internet Relay Chat
-(IRC) code lives in `backend/`. The static public website lives in `website/`; see
-[Website](README.md#website).
-
 ## Failure modes
 
 `status: needs-design` means the design needs agreement before implementation.
@@ -187,6 +229,5 @@ should take over, release the claim.
 ## Source
 
 - [Writing style](docs/STYLE.md)
-- [Local checks and release instructions](README.md)
-- [User-facing changelog](CHANGELOG.md)
+- [Development setup and checks](README.md)
 - [Shared issue tracker](https://github.com/ircord/issues/issues)
