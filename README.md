@@ -16,6 +16,8 @@ cd IRCord
 This repository pins the [backend](https://github.com/ircord/backend),
 [frontend](https://github.com/ircord/frontend), [CLI](https://github.com/ircord/cli),
 and [website](https://github.com/ircord/ircord.com) commits that work together.
+It also checks out [desktop](https://github.com/ircord/desktop),
+[mobile](https://github.com/ircord/mobile), and [hosting](https://github.com/ircord/hosting).
 Run `git submodule update --init --recursive` after updating this repository.
 
 To change a component, create a branch inside its directory. Push the component
@@ -24,8 +26,13 @@ components, update and test all affected pins together.
 
 The [original repository](https://github.com/karbowiak/ircord) holds earlier
 releases and their issue and pull request history.
+Report new bugs or requests in the [IRCord issue tracker](https://github.com/ircord/issues/issues/new/choose).
 
 ## Run with Docker
+
+For self-hosting with published images, use the
+[production Compose file or Helm chart](https://github.com/ircord/hosting).
+The Compose file in this development workspace builds from source.
 
 ```sh
 docker compose up -d --build

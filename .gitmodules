@@ -10,3 +10,12 @@
 [submodule "website"]
 	path = website
 	url = https://github.com/ircord/ircord.com.git
+[submodule "desktop"]
+	path = desktop
+	url = https://github.com/ircord/desktop.git
+[submodule "mobile"]
+	path = mobile
+	url = https://github.com/ircord/mobile.git
+[submodule "hosting"]
+	path = hosting
+	url = https://github.com/ircord/hosting.git

@@ -189,4 +189,4 @@ should take over, release the claim.
 - [Writing style](docs/STYLE.md)
 - [Local checks and release instructions](README.md)
 - [User-facing changelog](CHANGELOG.md)
-- [Shared backlog](https://github.com/karbowiak/ircord/issues/23)
+- [Shared issue tracker](https://github.com/ircord/issues/issues)
