@@ -6,6 +6,25 @@ Clients use authenticated HTTP APIs and a private WebSocket event stream.
 
 Try the feedback instance at [chat.ircord.com](https://chat.ircord.com).
 
+## Get the development workspace
+
+```sh
+git clone --recurse-submodules https://github.com/ircord/dev-environment.git IRCord
+cd IRCord
+```
+
+This repository pins the [backend](https://github.com/ircord/backend),
+[frontend](https://github.com/ircord/frontend), [CLI](https://github.com/ircord/cli),
+and [website](https://github.com/ircord/ircord.com) commits that work together.
+Run `git submodule update --init --recursive` after updating this repository.
+
+To change a component, create a branch inside its directory. Push the component
+commit before recording its new submodule pin here. For changes that span
+components, update and test all affected pins together.
+
+The [original repository](https://github.com/karbowiak/ircord) holds earlier
+releases and their issue and pull request history.
+
 ## Run with Docker
 
 ```sh
@@ -819,7 +838,7 @@ curl -X PUT -H "Authorization: Bearer $IRCORD_ADMIN_TOKEN" https://chat.example.
 
 ## Website
 
-The public website at [ircord.com](https://ircord.com) lives in `website/`.
+The [public website](https://ircord.com) is checked out at `website/`.
 It is a static Nuxt site with a home page and a What's new page made from `CHANGELOG.md`.
 It sends no scripts, needs no environment variables and imports nothing from `frontend/` or `backend/`.
 Its colors follow the app's Hibiki scheme.
@@ -835,7 +854,8 @@ bun run generate   # writes the static site to .output/public
 
 To serve the generated site as in production, build and run the image ([Website image](#website-image)).
 
-Run `make website-check` from the repository root for lint, types, unit tests and the static build.
+Run `make website` from the workspace root to preview the shared changelog.
+Run `make website-check` for lint, types, unit tests, and the static build.
 
 ### Website screenshots
 
@@ -855,28 +875,31 @@ It draws emoji with the Noto Color Emoji font from the website's development dep
 
 ### Website image
 
-`website/Dockerfile` builds the site and serves it with unprivileged nginx on port 8080, configured in `website/nginx.conf` and `website/security-headers.conf`.
+`website/Dockerfile` builds the site and serves it with unprivileged nginx on port 8080.
+Its configuration lives in `website/nginx.conf` and `website/security-headers.conf`.
 The server sends a strict Content Security Policy and lets browsers cache hashed files for a year.
 Build it from the repository root:
 
 ```sh
-docker build -f website/Dockerfile -t ircord-website .
+docker build -t ircord-website website
 ```
 
-Release tags publish it as `ghcr.io/karbowiak/ircord-website`. Serve it at ircord.com; chat.ircord.com keeps serving the app.
+Release tags publish the image as `ghcr.io/ircord/ircord-website`.
+Serve the website at `ircord.com` and the app at `chat.ircord.com`.
 
 ## Releases
 
-GitHub Actions builds and publishes only when a version tag such as `v0.1.0` is pushed. Branch pushes and pull requests do not trigger publication.
+GitHub Actions checks branch changes and publishes on version tags such as `v0.7.3`.
 
-Two independent workflows run for the same tag. Each runs the shared checks (`make test`, `make check`, frontend and website lint, types and build) and publishes nothing unless they pass:
-
-- **Containers:** backend, frontend and website build in parallel after Go version selection; the frontend also waits for its release notes. Each image supports Linux amd64 and arm64.
-- **CLI:** tests and checks the standalone client, then cross-builds six targets in parallel using the latest stable Go. Publication waits for the complete CLI matrix, independently of container success.
+- The workspace tag pins the components. Its workflow checks the full workspace
+  and builds the backend, frontend, and website images for Linux amd64 and arm64.
+- The matching CLI tag must point to the CLI commit pinned by the workspace tag.
+  Its workflow checks the client and publishes all six platform builds together.
 
 ### Standalone CLI downloads
 
-Download `ircordctl` from the matching [GitHub Release](https://github.com/karbowiak/ircord/releases). Each archive contains the binary and its MIT license:
+Download `ircordctl` from the matching [GitHub Release](https://github.com/ircord/cli/releases).
+Each archive contains the binary and its MIT license.
 
 | Platform         | Architectures                            | Archive   |
 | ---------------- | ---------------------------------------- | --------- |
@@ -898,25 +921,36 @@ On Linux use `sha256sum --ignore-missing -c` instead. A new release gets the tag
 
 The container workflow publishes:
 
-- `ghcr.io/karbowiak/ircord-backend:v0.1.0`
-- `ghcr.io/karbowiak/ircord-frontend:v0.1.0`
-- `ghcr.io/karbowiak/ircord-website:v0.1.0`
+- `ghcr.io/ircord/ircord-backend:v0.7.3`
+- `ghcr.io/ircord/ircord-frontend:v0.7.3`
+- `ghcr.io/ircord/ircord-website:v0.7.3`
 
-Each image also has a commit tag. Flux follows stable `vX.Y.Z` releases.
+Each image also has a tag for the workspace commit. Flux follows stable `vX.Y.Z` releases.
 
 ### Cutting a release
 
 `CHANGELOG.md` is the user-facing changelog. Every pull request with a user-visible change adds one plain-language line under `## Unreleased`, grouped as **New**, **Improved** or **Fixed**; refactors, tests, CI, tooling and docs add nothing.
 
 1. In the release commit, rename `## Unreleased` to `## v0.1.0 — YYYY-MM-DD` (today's date) and add a fresh, empty `## Unreleased` above it. A release with nothing user-facing gets the single line "Behind-the-scenes improvements."
-2. Run `make test check frontend-check website-check`. Push that commit to `main`, then tag it: `git tag v0.1.0` and `git push origin v0.1.0`. If the tag's checks fail, nothing is published: fix the problem on `main` and release the next patch version. Don't move the tag, because Flux follows stable tags.
+2. Run `make test check frontend-check website-check`.
+3. Push the release commit to workspace `main`.
+4. Tag and push the release commit in the workspace repository.
+5. Tag and push the pinned CLI commit in the CLI repository with the same version.
+6. Check all three images and the CLI assets.
+
+If a tag fails because of source changes, fix the source and release the next patch version.
 
 That section becomes the GitHub Release notes and the in-client notes.
 
 ### In-client release notes
 
-The frontend image carries the release notes of its own tag and every earlier release, shown in the update banner's **What’s new** dialog and under Settings → About. Before the image builds, `frontend/scripts/release-changelog.mjs` takes each release's section of `CHANGELOG.md` at the tagged commit. Releases from before the changelog existed keep their GitHub Release notes; for a tag with no section whose release the CLI workflow has not created yet, it takes the notes from GitHub's release-notes generator. Newer tags, drafts and (for stable builds) prereleases are left out, also when they have a changelog section. Notes edited after an image was built appear from the next release's image on. Builds without a tag (local and development builds) show no notes.
+The frontend image carries release notes through its own version. The app shows
+them in **What’s new** and under Settings → About. The workspace release uses
+`CHANGELOG.md` at the tagged commit and reads older notes from the original
+repository's GitHub releases. Local and development builds show no release notes.
 
 ### Collaborators
 
-`COLLABORATORS.md` at the repository root lists the people who build IRCord, one `- Name` line each, and is the one tracked Markdown file that goes into the frontend image: the build reads it and Settings → About shows the names. Add a line there to be credited; the next build picks it up.
+`COLLABORATORS.md` at the workspace root lists the people who build IRCord.
+Add one `- Name` line per person. The next release uses the updated names in
+Settings → About and on the public site.

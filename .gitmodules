@@ -1,0 +1,12 @@
+[submodule "backend"]
+	path = backend
+	url = https://github.com/ircord/backend.git
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/ircord/frontend.git
+[submodule "cli"]
+	path = cli
+	url = https://github.com/ircord/cli.git
+[submodule "website"]
+	path = website
+	url = https://github.com/ircord/ircord.com.git

@@ -1,9 +1,7 @@
 services:
   backend:
-    image: ghcr.io/karbowiak/ircord-backend:main
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
+    image: ircord-dev-backend
+    build: ./backend
     restart: unless-stopped
     environment:
       IRCORD_PUBLIC_URL: ${IRCORD_PUBLIC_URL:-http://localhost:3000}
@@ -21,10 +19,8 @@ services:
     tmpfs: [/tmp]
     stop_grace_period: 45s
   frontend:
-    image: ghcr.io/karbowiak/ircord-frontend:main
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
+    image: ircord-dev-frontend
+    build: ./frontend
     restart: unless-stopped
     environment:
       NUXT_BACKEND_URL: http://backend:8080

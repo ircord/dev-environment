@@ -18,9 +18,9 @@ build:
 frontend-check:
 	cd frontend && bun run api:check && bun run lint && bun run typecheck && bun run test:unit && bun run build
 website-check:
-	cd website && bun run lint && bun run typecheck && bun run test && bun run generate
+	cd website && export IRCORD_RELEASE_DIR="$(CURDIR)" && bun run lint && bun run typecheck && bun run test && bun run generate
 
-.PHONY: backend frontend dev-backend
+.PHONY: backend frontend website dev-backend
 AIR ?= air
 backend:
 	@command -v "$(AIR)" >/dev/null 2>&1 || { printf '%s\n' 'Air is required: go install github.com/air-verse/air@v1.67.4' >&2; exit 1; }
@@ -42,6 +42,8 @@ backend:
 	exec "$(AIR)" -c .air.toml
 frontend:
 	cd frontend && bun run dev
+website:
+	cd website && IRCORD_RELEASE_DIR="$(CURDIR)" bun run dev
 dev-backend: backend
 ergo-up:
 	sh infra/ergo/setup.sh
@@ -73,9 +75,13 @@ test-s3: s3-up
 	cd backend && IRCORD_TEST_S3_ENDPOINT=127.0.0.1:19000 go test -race -count=1 ./internal/filehost
 .PHONY: api-generate api-check
 api-generate:
+	cd backend && set -eu; schema=$$(mktemp ./openapi.XXXXXX); \
+	trap 'rm -f "$$schema"' EXIT; \
+	go run ./cmd/openapi > "$$schema"; chmod 644 "$$schema"; mv "$$schema" openapi.json
 	cd frontend && bun run api:generate
 	sh cli/generate.sh
 api-check:
+	cd backend && go run ./cmd/openapi | cmp - openapi.json
 	cd frontend && bun run api:check
 	sh cli/generate.sh --check
 endif
