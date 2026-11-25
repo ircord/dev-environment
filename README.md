@@ -810,7 +810,7 @@ printf '%s\n' "$NEW_PASSWORD" | make cli -- accounts reset-password alice --pass
 make cli -- accounts reset-password alice --password-file ./new-password
 ```
 
-The password is never taken from command arguments or printed. The reset is saved encrypted before the IRC server is touched. If the IRC server can't be reached, the command reports `pending` and exits with 1. Sign-in stays blocked, and the backend retries every 30 seconds and at startup until both sides agree. Running the command again with the same password is safe. If the IRC server refuses the change outright, for example because it has no account of that name, nothing is changed and the command fails. `ircordctl accounts reset-password --help` lists the exit codes. Each reset that reaches the backend is recorded in the backend's `admin_audit` table and log with the target, time and outcome, and never with the password.
+The password is never taken from command arguments or printed. The reset is saved encrypted before the IRC server is touched. If the IRC server can't be reached, the command reports `pending` and exits with 1. The backend makes up to three automatic attempts, including at startup. Sign-in stays blocked until the reset finishes. To retry manually, run the command again with the same password or sign in with the new password. If the IRC server refuses the change outright, for example because it has no account of that name, nothing is changed and the command fails. `ircordctl accounts reset-password --help` lists the exit codes. Each reset that reaches the backend is recorded in the backend's `admin_audit` table and log with the target, time and outcome, and never with the password.
 
 ### Server owners and the Administration panel
 
